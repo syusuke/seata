@@ -57,6 +57,7 @@ public class DruidDelegatingSQLRecognizerFactory implements SQLRecognizerFactory
 
     @Override
     public List<SQLRecognizer> create(String sql, String dbType) {
+        // 委托
         return recognizerFactoryImpl.create(sql, dbType);
     }
 }

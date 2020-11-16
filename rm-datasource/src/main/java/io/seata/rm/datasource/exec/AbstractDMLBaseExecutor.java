@@ -83,6 +83,7 @@ public abstract class AbstractDMLBaseExecutor<T, S extends Statement> extends Ba
         if (connectionProxy.getAutoCommit()) {
             return executeAutoCommitTrue(args);
         } else {
+            // 最后还是执行这里的逻辑
             return executeAutoCommitFalse(args);
         }
     }
@@ -96,11 +97,15 @@ public abstract class AbstractDMLBaseExecutor<T, S extends Statement> extends Ba
      */
     protected T executeAutoCommitFalse(Object[] args) throws Exception {
         if (!JdbcConstants.MYSQL.equalsIgnoreCase(getDbType()) && isMultiPk()) {
+            // 目前多主键只支持MYSQL
             throw new NotSupportYetException("multi pk only support mysql!");
         }
+        // 获取得更新前的记录
         TableRecords beforeImage = beforeImage();
+        // 执行原始的SQL
         T result = statementCallback.execute(statementProxy.getTargetStatement(), args);
         TableRecords afterImage = afterImage(beforeImage);
+        // 插入到 undo_log 表中
         prepareUndoLog(beforeImage, afterImage);
         return result;
     }

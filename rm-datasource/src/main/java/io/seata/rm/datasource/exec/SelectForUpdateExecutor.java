@@ -80,7 +80,9 @@ public class SelectForUpdateExecutor<T, S extends Statement> extends BaseTransac
             }
 
             LockRetryController lockRetryController = new LockRetryController();
+            // 参数列表
             ArrayList<List<Object>> paramAppenderList = new ArrayList<>();
+            // 比如:更新数据库前,先锁定指定行 select primaryKeys,更新的字段 from XXX for update
             String selectPKSQL = buildSelectSQL(paramAppenderList);
             while (true) {
                 try {
@@ -91,6 +93,7 @@ public class SelectForUpdateExecutor<T, S extends Statement> extends BaseTransac
 
                     // Try to get global lock of those rows selected
                     TableRecords selectPKRows = buildTableRecords(getTableMeta(), selectPKSQL, paramAppenderList);
+                    // 锁的名字,生成的.
                     String lockKeys = buildLockKey(selectPKRows);
                     if (StringUtils.isNullOrEmpty(lockKeys)) {
                         break;

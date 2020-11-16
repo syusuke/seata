@@ -104,12 +104,14 @@ public abstract class BaseTransactionalExecutor<T, S extends Statement> implemen
 
     @Override
     public T execute(Object... args) throws Throwable {
+        // get XID
         String xid = RootContext.getXID();
         if (xid != null) {
             statementProxy.getConnectionProxy().bind(xid);
         }
 
         statementProxy.getConnectionProxy().setGlobalLockRequire(RootContext.requireGlobalLock());
+        // execute sql
         return doExecute(args);
     }
 
@@ -267,6 +269,7 @@ public abstract class BaseTransactionalExecutor<T, S extends Statement> implemen
      */
     protected void prepareUndoLog(TableRecords beforeImage, TableRecords afterImage) throws SQLException {
         if (beforeImage.getRows().isEmpty() && afterImage.getRows().isEmpty()) {
+            // 前后两个数据都为空
             return;
         }
 
@@ -277,6 +280,7 @@ public abstract class BaseTransactionalExecutor<T, S extends Statement> implemen
         connectionProxy.appendLockKey(lockKeys);
 
         SQLUndoLog sqlUndoLog = buildUndoItem(beforeImage, afterImage);
+        // 添加到 undo_log
         connectionProxy.appendUndoLog(sqlUndoLog);
     }
 

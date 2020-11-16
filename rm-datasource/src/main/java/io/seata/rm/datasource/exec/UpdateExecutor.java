@@ -68,6 +68,7 @@ public class UpdateExecutor<T, S extends Statement> extends AbstractDMLBaseExecu
     protected TableRecords beforeImage() throws SQLException {
         ArrayList<List<Object>> paramAppenderList = new ArrayList<>();
         TableMeta tmeta = getTableMeta();
+        // 这里生成了更新前的查询数据的SQL
         String selectSQL = buildBeforeImageSQL(tmeta, paramAppenderList);
         return buildTableRecords(tmeta, selectSQL, paramAppenderList);
     }

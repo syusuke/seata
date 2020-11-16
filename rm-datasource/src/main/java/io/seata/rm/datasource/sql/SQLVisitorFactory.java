@@ -16,6 +16,7 @@
 package io.seata.rm.datasource.sql;
 
 import io.seata.common.loader.EnhancedServiceLoader;
+import io.seata.common.loader.LoadLevel;
 import io.seata.config.ConfigurationFactory;
 import io.seata.core.constants.ConfigurationKeys;
 import io.seata.sqlparser.SQLRecognizer;
@@ -46,6 +47,8 @@ public class SQLVisitorFactory {
      * @return the sql recognizer
      */
     public static List<SQLRecognizer> get(String sql, String dbType) {
+        // @LoadLevel(name = SqlParserType.SQL_PARSER_TYPE_DRUID)
+        // DruidDelegatingSQLRecognizerFactory
         return SQL_RECOGNIZER_FACTORY.create(sql, dbType);
     }
 

@@ -71,8 +71,10 @@ public class ExecuteTemplate {
             return statementCallback.execute(statementProxy.getTargetStatement(), args);
         }
 
+        // 数据库类型,如: mysql
         String dbType = statementProxy.getConnectionProxy().getDbType();
         if (CollectionUtils.isEmpty(sqlRecognizers)) {
+            //  statementProxy.getTargetSQL() 原始运行的SQL,解析SQL
             sqlRecognizers = SQLVisitorFactory.get(
                     statementProxy.getTargetSQL(),
                     dbType);
@@ -85,6 +87,7 @@ public class ExecuteTemplate {
                 SQLRecognizer sqlRecognizer = sqlRecognizers.get(0);
                 switch (sqlRecognizer.getSQLType()) {
                     case INSERT:
+                        // 根据类型不同, 加载不同的 Executor
                         executor = EnhancedServiceLoader.load(InsertExecutor.class, dbType,
                                 new Class[]{StatementProxy.class, StatementCallback.class, SQLRecognizer.class},
                                 new Object[]{statementProxy, statementCallback, sqlRecognizer});
