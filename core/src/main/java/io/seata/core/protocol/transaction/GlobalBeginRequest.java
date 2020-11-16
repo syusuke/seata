@@ -73,6 +73,7 @@ public class GlobalBeginRequest extends AbstractTransactionRequestToTC {
 
     @Override
     public AbstractTransactionResponse handle(RpcContext rpcContext) {
+        // 开启全局事务,并取得回复
         return handler.handle(this, rpcContext);
     }
 

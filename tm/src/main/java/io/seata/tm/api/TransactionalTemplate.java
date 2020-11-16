@@ -64,13 +64,17 @@ public class TransactionalTemplate {
                 case NOT_SUPPORTED:
                     // If transaction is existing, suspend it.
                     if (existingTransaction(tx)) {
+                        // 存在事务,挂起
                         suspendedResourcesHolder = tx.suspend();
                     }
+                    // 非事务执行
                     // Execute without transaction and return.
                     return business.execute();
                 case REQUIRES_NEW:
+                    // 开启新事务
                     // If transaction is existing, suspend it, and then begin new transaction.
                     if (existingTransaction(tx)) {
+                        // 存在就挂起当前事务,创建新的事务
                         suspendedResourcesHolder = tx.suspend();
                         tx = GlobalTransactionContext.createNew();
                     }
@@ -79,8 +83,10 @@ public class TransactionalTemplate {
                 case SUPPORTS:
                     // If transaction is not existing, execute without transaction.
                     if (notExistingTransaction(tx)) {
+                        // 如果当前不存在事务，则以非事务方式运行，这个和不写没区别
                         return business.execute();
                     }
+                    // 如果当前存在事务，则加入事务
                     // Continue and execute with new transaction
                     break;
                 case REQUIRED:
@@ -88,6 +94,7 @@ public class TransactionalTemplate {
                     // else continue and execute with new transaction.
                     break;
                 case NEVER:
+                    // 以非事务方式运行，如果当前存在事务，则抛出异常，即父级方法必须无事务
                     // If transaction is existing, throw exception.
                     if (existingTransaction(tx)) {
                         throw new TransactionException(
@@ -123,14 +130,16 @@ public class TransactionalTemplate {
 
                 Object rs;
                 try {
+                    // 开启事务,执行方法中的内容
                     // Do Your Business
                     rs = business.execute();
                 } catch (Throwable ex) {
+                    // 回滚
                     // 3. The needed business exception to rollback.
                     completeTransactionAfterThrowing(txInfo, tx, ex);
                     throw ex;
                 }
-
+                // 提交
                 // 4. everything is fine, commit.
                 commitTransaction(tx);
 
@@ -176,6 +185,7 @@ public class TransactionalTemplate {
         //roll back
         if (txInfo != null && txInfo.rollbackOn(originalException)) {
             try {
+                // 回滚
                 rollbackTransaction(tx, originalException);
             } catch (TransactionException txe) {
                 // Failed to rollback
@@ -183,6 +193,7 @@ public class TransactionalTemplate {
                         TransactionalExecutor.Code.RollbackFailure, originalException);
             }
         } else {
+            // 提交
             // not roll back on this exception, so commit
             commitTransaction(tx);
         }

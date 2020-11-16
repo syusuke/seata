@@ -96,6 +96,7 @@ public class ExecuteTemplate {
                         executor = new DeleteExecutor<>(statementProxy, statementCallback, sqlRecognizer);
                         break;
                     case SELECT_FOR_UPDATE:
+                        // select for update
                         executor = new SelectForUpdateExecutor<>(statementProxy, statementCallback, sqlRecognizer);
                         break;
                     default:
@@ -108,6 +109,7 @@ public class ExecuteTemplate {
         }
         T rs;
         try {
+            // 执行
             rs = executor.execute(args);
         } catch (Throwable ex) {
             if (!(ex instanceof SQLException)) {

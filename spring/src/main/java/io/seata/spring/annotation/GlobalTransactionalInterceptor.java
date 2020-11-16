@@ -147,8 +147,10 @@ public class GlobalTransactionalInterceptor implements ConfigurationChangeListen
             boolean localDisable = disable || (degradeCheck && degradeNum >= degradeCheckAllowTimes);
             if (!localDisable) {
                 if (globalTransactionalAnnotation != null) {
+                    // 全局事务注解
                     return handleGlobalTransaction(methodInvocation, globalTransactionalAnnotation);
                 } else if (globalLockAnnotation != null) {
+                    // 全局锁
                     return handleGlobalLock(methodInvocation, globalLockAnnotation);
                 }
             }
@@ -185,15 +187,18 @@ public class GlobalTransactionalInterceptor implements ConfigurationChangeListen
                 }
 
                 public String name() {
+                    // 全局事务名  // @GlobalTransaction(name="")
                     String name = globalTrxAnno.name();
                     if (!StringUtils.isNullOrEmpty(name)) {
                         return name;
                     }
+                    // 没写就是方法名的签名
                     return formatMethod(methodInvocation.getMethod());
                 }
 
                 @Override
                 public TransactionInfo getTransactionInfo() {
+                    // 获取一些 @GlobalTransaction 注解的信息
                     // reset the value of timeout
                     int timeout = globalTrxAnno.timeoutMills();
                     if (timeout <= 0 || timeout == DEFAULT_GLOBAL_TRANSACTION_TIMEOUT) {

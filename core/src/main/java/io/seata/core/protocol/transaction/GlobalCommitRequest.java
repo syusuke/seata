@@ -31,6 +31,7 @@ public class GlobalCommitRequest extends AbstractGlobalEndRequest {
 
     @Override
     public AbstractTransactionResponse handle(RpcContext rpcContext) {
+        // 全局提交
         return handler.handle(this, rpcContext);
     }
 }

@@ -58,6 +58,7 @@ public abstract class AbstractNettyRemotingServer extends AbstractNettyRemoting 
     public AbstractNettyRemotingServer(ThreadPoolExecutor messageExecutor, NettyServerConfig nettyServerConfig) {
         super(messageExecutor);
         serverBootstrap = new NettyServerBootstrap(nettyServerConfig);
+        // Netty 消息解码后,就只有一个 ServerHanlder
         serverBootstrap.setChannelHandlers(new ServerHandler());
     }
 
@@ -172,6 +173,7 @@ public abstract class AbstractNettyRemotingServer extends AbstractNettyRemoting 
             if (!(msg instanceof RpcMessage)) {
                 return;
             }
+            // 处理消息
             processMessage(ctx, (RpcMessage) msg);
         }
 

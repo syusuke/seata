@@ -114,6 +114,7 @@ public abstract class AbstractNettyRemotingClient extends AbstractNettyRemoting 
                 clientChannelManager.reconnect(getTransactionServiceGroup());
             }
         }, SCHEDULE_DELAY_MILLS, SCHEDULE_INTERVAL_MILLS, TimeUnit.MILLISECONDS);
+
         if (NettyClientConfig.isEnableClientBatchSendRequest()) {
             mergeSendExecutorService = new ThreadPoolExecutor(MAX_MERGE_SEND_THREAD,
                 MAX_MERGE_SEND_THREAD,
@@ -123,6 +124,7 @@ public abstract class AbstractNettyRemotingClient extends AbstractNettyRemoting 
             mergeSendExecutorService.submit(new MergedSendRunnable());
         }
         super.init();
+        // 通过ClientHandler分发
         clientBootstrap.start();
     }
 
@@ -131,6 +133,7 @@ public abstract class AbstractNettyRemotingClient extends AbstractNettyRemoting 
         super(messageExecutor);
         this.transactionRole = transactionRole;
         clientBootstrap = new NettyClientBootstrap(nettyClientConfig, eventExecutorGroup, transactionRole);
+        // 分发 ClientHandler()
         clientBootstrap.setChannelHandlers(new ClientHandler());
         clientChannelManager = new NettyClientChannelManager(
             new NettyPoolableFactory(this, clientBootstrap), getPoolKeyFunction(), nettyClientConfig);
@@ -432,6 +435,7 @@ public abstract class AbstractNettyRemotingClient extends AbstractNettyRemoting 
                         if (LOGGER.isDebugEnabled()) {
                             LOGGER.debug("will send ping msg,channel {}", ctx.channel());
                         }
+                        // send ping
                         AbstractNettyRemotingClient.this.sendAsyncRequest(ctx.channel(), HeartbeatMessage.PING);
                     } catch (Throwable throwable) {
                         LOGGER.error("send request error: {}", throwable.getMessage(), throwable);

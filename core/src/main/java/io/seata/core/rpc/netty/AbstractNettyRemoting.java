@@ -268,13 +268,17 @@ public abstract class AbstractNettyRemoting implements Disposable {
         }
         Object body = rpcMessage.getBody();
         if (body instanceof MessageTypeAware) {
+            // 必须实现 MessageTypeAware 接口
             MessageTypeAware messageTypeAware = (MessageTypeAware) body;
+            // io.seata.core.rpc.netty.NettyRemotingServer.registerProcessor
             final Pair<RemotingProcessor, ExecutorService> pair = this.processorTable.get((int) messageTypeAware.getTypeCode());
             if (pair != null) {
                 if (pair.getSecond() != null) {
+                    // getSecond() = ExecutorService not null
                     try {
                         pair.getSecond().execute(() -> {
                             try {
+                                // getFirst() == RemotingProcessor 处理消息
                                 pair.getFirst().process(ctx, rpcMessage);
                             } catch (Throwable th) {
                                 LOGGER.error(FrameworkErrorCode.NetDispatch.getErrCode(), th.getMessage(), th);
@@ -284,6 +288,7 @@ public abstract class AbstractNettyRemoting implements Disposable {
                         LOGGER.error(FrameworkErrorCode.ThreadPoolFull.getErrCode(),
                             "thread pool is full, current max pool size is " + messageExecutor.getActiveCount());
                         if (allowDumpStack) {
+                            // dump memory
                             String name = ManagementFactory.getRuntimeMXBean().getName();
                             String pid = name.split("@")[0];
                             int idx = new Random().nextInt(100);
@@ -297,6 +302,7 @@ public abstract class AbstractNettyRemoting implements Disposable {
                     }
                 } else {
                     try {
+                        // 在当前所在线程运行
                         pair.getFirst().process(ctx, rpcMessage);
                     } catch (Throwable th) {
                         LOGGER.error(FrameworkErrorCode.NetDispatch.getErrCode(), th.getMessage(), th);

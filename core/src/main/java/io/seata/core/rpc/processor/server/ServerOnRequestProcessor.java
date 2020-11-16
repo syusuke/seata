@@ -64,6 +64,11 @@ public class ServerOnRequestProcessor implements RemotingProcessor {
 
     private RemotingServer remotingServer;
 
+    /**
+     * DefaultCoordinator 在 io.seata.server.Server#main(java.lang.String[])
+     * io.seata.core.rpc.netty.NettyRemotingServer#registerProcessor() getHandler() 中传过来
+     * 默认实现 io.seata.server.coordinator.DefaultCoordinator
+     */
     private TransactionMessageHandler transactionMessageHandler;
 
     public ServerOnRequestProcessor(RemotingServer remotingServer, TransactionMessageHandler transactionMessageHandler) {
@@ -94,6 +99,7 @@ public class ServerOnRequestProcessor implements RemotingProcessor {
     private void onRequestMessage(ChannelHandlerContext ctx, RpcMessage rpcMessage) {
         Object message = rpcMessage.getBody();
         RpcContext rpcContext = ChannelManager.getContextFromIdentified(ctx.channel());
+        // log
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("server received:{},clientIp:{},vgroup:{}", message,
                 NetUtil.toIpAddress(ctx.channel().remoteAddress()), rpcContext.getTransactionServiceGroup());
@@ -106,10 +112,12 @@ public class ServerOnRequestProcessor implements RemotingProcessor {
                 LOGGER.error("put message to logQueue error: {}", e.getMessage(), e);
             }
         }
+        // AbstractMessage.class
         if (!(message instanceof AbstractMessage)) {
             return;
         }
         if (message instanceof MergedWarpMessage) {
+            // 特殊处理
             AbstractResultMessage[] results = new AbstractResultMessage[((MergedWarpMessage) message).msgs.size()];
             for (int i = 0; i < results.length; i++) {
                 final AbstractMessage subMessage = ((MergedWarpMessage) message).msgs.get(i);
@@ -122,6 +130,7 @@ public class ServerOnRequestProcessor implements RemotingProcessor {
             // the single send request message
             final AbstractMessage msg = (AbstractMessage) message;
             AbstractResultMessage result = transactionMessageHandler.onRequest(msg, rpcContext);
+            // 回复消息
             remotingServer.sendAsyncResponse(rpcMessage, ctx.channel(), result);
         }
     }

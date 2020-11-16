@@ -294,6 +294,7 @@ public class DefaultCore implements Core {
                     continue;
                 }
                 try {
+                    // 分支事务回滚
                     BranchStatus branchStatus = branchRollback(globalSession, branchSession);
                     switch (branchStatus) {
                         case PhaseTwo_Rollbacked:

@@ -138,6 +138,7 @@ public class NettyClientBootstrap implements RemotingBootstrap {
                         .addLast(new ProtocolV1Decoder())
                         .addLast(new ProtocolV1Encoder());
                     if (channelHandlers != null) {
+                        // 如: ClientHandler
                         addChannelPipelineLast(ch, channelHandlers);
                     }
                 }

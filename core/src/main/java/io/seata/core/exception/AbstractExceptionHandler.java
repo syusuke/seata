@@ -113,6 +113,7 @@ public abstract class AbstractExceptionHandler {
      */
     public <T extends AbstractTransactionRequest, S extends AbstractTransactionResponse> void exceptionHandleTemplate(Callback<T, S> callback, T request, S response) {
         try {
+            // RUN 匿名 方法中的内容     protected abstract void doGlobalBegin(GlobalBeginRequest request, GlobalBeginResponse response)
             callback.execute(request, response);
             callback.onSuccess(request, response);
         } catch (TransactionException tex) {

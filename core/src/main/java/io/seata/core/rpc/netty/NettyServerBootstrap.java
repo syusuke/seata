@@ -61,6 +61,7 @@ public class NettyServerBootstrap implements RemotingBootstrap {
 
         this.nettyServerConfig = nettyServerConfig;
         if (NettyServerConfig.enableEpoll()) {
+            // 启用 epoll
             this.eventLoopGroupBoss = new EpollEventLoopGroup(nettyServerConfig.getBossThreadSize(),
                 new NamedThreadFactory(nettyServerConfig.getBossThreadPrefix(), nettyServerConfig.getBossThreadSize()));
             this.eventLoopGroupWorker = new EpollEventLoopGroup(nettyServerConfig.getServerWorkerThreads(),

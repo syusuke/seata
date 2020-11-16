@@ -90,18 +90,21 @@ public class DefaultGlobalTransaction implements GlobalTransaction {
     @Override
     public void begin(int timeout, String name) throws TransactionException {
         if (role != GlobalTransactionRole.Launcher) {
+            // 相当于全局事务
             assertXIDNotNull();
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Ignore Begin(): just involved in global transaction [{}]", xid);
             }
             return;
         }
+        // 加入全局事务前,XID必须为空,分支事务
         assertXIDNull();
         String currentXid = RootContext.getXID();
         if (currentXid != null) {
             throw new IllegalStateException("Global transaction already exists," +
                 " can't begin a new global transaction, currentXid = " + currentXid);
         }
+        // 开启全局事务 transactionManager 应该是 io.seata.tm.DefaultTransactionManager
         xid = transactionManager.begin(null, null, name, timeout);
         status = GlobalStatus.Begin;
         RootContext.bind(xid);

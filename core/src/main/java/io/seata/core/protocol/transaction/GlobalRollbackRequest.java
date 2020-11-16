@@ -31,6 +31,7 @@ public class GlobalRollbackRequest extends AbstractGlobalEndRequest {
 
     @Override
     public AbstractTransactionResponse handle(RpcContext rpcContext) {
+        // 全局回滚
         return handler.handle(this, rpcContext);
     }
 }

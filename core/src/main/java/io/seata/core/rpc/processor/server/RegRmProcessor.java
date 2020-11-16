@@ -22,9 +22,9 @@ import io.seata.core.protocol.RegisterRMRequest;
 import io.seata.core.protocol.RegisterRMResponse;
 import io.seata.core.protocol.RpcMessage;
 import io.seata.core.protocol.Version;
-import io.seata.core.rpc.netty.ChannelManager;
-import io.seata.core.rpc.RemotingServer;
 import io.seata.core.rpc.RegisterCheckAuthHandler;
+import io.seata.core.rpc.RemotingServer;
+import io.seata.core.rpc.netty.ChannelManager;
 import io.seata.core.rpc.processor.RemotingProcessor;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -54,16 +54,20 @@ public class RegRmProcessor implements RemotingProcessor {
 
     @Override
     public void process(ChannelHandlerContext ctx, RpcMessage rpcMessage) throws Exception {
+        // ResourceManager
         onRegRmMessage(ctx, rpcMessage);
     }
 
     private void onRegRmMessage(ChannelHandlerContext ctx, RpcMessage rpcMessage) {
+        // 注册 ResourceManager
         RegisterRMRequest message = (RegisterRMRequest) rpcMessage.getBody();
+        // ResourceManager 的地址
         String ipAndPort = NetUtil.toStringAddress(ctx.channel().remoteAddress());
         boolean isSuccess = false;
         String errorInfo = StringUtils.EMPTY;
         try {
             if (null == checkAuthHandler || checkAuthHandler.regResourceManagerCheckAuth(message)) {
+                // NULL 直接注册,或者认证通过
                 ChannelManager.registerRMChannel(message, ctx.channel());
                 Version.putChannelVersion(ctx.channel(), message.getVersion());
                 isSuccess = true;
@@ -83,7 +87,7 @@ public class RegRmProcessor implements RemotingProcessor {
         remotingServer.sendAsyncResponse(rpcMessage, ctx.channel(), response);
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info("RM register success,message:{},channel:{},client version:{}", message, ctx.channel(),
-                message.getVersion());
+                    message.getVersion());
         }
     }
 

@@ -69,11 +69,12 @@ public abstract class AbstractTCInboundHandler extends AbstractExceptionHandler 
                 }
             }
         }, request, response);
+        // 返回执行结果
         return response;
     }
 
     /**
-     * Do global begin.
+     * Do global begin. 开启全局事务
      *
      * @param request    the request
      * @param response   the response
@@ -83,6 +84,13 @@ public abstract class AbstractTCInboundHandler extends AbstractExceptionHandler 
     protected abstract void doGlobalBegin(GlobalBeginRequest request, GlobalBeginResponse response,
                                           RpcContext rpcContext) throws TransactionException;
 
+    /**
+     * 提交全局事务
+     *
+     * @param request
+     * @param rpcContext   the rpc context
+     * @return
+     */
     @Override
     public GlobalCommitResponse handle(GlobalCommitRequest request, final RpcContext rpcContext) {
         GlobalCommitResponse response = new GlobalCommitResponse();
@@ -118,7 +126,7 @@ public abstract class AbstractTCInboundHandler extends AbstractExceptionHandler 
     }
 
     /**
-     * Do global commit.
+     * Do global commit. global commit
      *
      * @param request    the request
      * @param response   the response
@@ -163,7 +171,7 @@ public abstract class AbstractTCInboundHandler extends AbstractExceptionHandler 
     }
 
     /**
-     * Do global rollback.
+     * Do global rollback. 全局回滚
      *
      * @param request    the request
      * @param response   the response
